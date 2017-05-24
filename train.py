@@ -11,19 +11,20 @@ import tensorflow as tf
 from keras.models import Sequential
 from keras.layers import Dense, Activation
 from keras.models import model_from_json
-from sklearn.preprocessing import normalize
+from sklearn.preprocessing import scale
+from keras.optimizers import Adam
 
 model = Sequential()
 model.add(Dense(32, input_dim=784))
 model.add(Activation('relu'))
 
 os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"
-os.environ["CUDA_VISIBLE_DEVICES"] = "7"
+os.environ["CUDA_VISIBLE_DEVICES"] = ""
 # Data sets
 
 path = "./data/m0000"
 save_path = "./models/"
-input_size = 8
+input_size = 1
 
 class dataset():
     def __init__(self, data, target):
@@ -44,18 +45,20 @@ def load_dataset():
         #print(tmp.shape)
         all_list.append(tmp)
 
-
+    print("concatenating matrix....")
     all_matrix = np.concatenate(all_list, axis=0)
-    all_data = all_matrix[:,0:-1]
-    all_target = all_matrix[:,-1]
-    all_data = normalize(all_matrix, norm='l2',axis = 0, return_norm = True)
-    print(norms)
-
     tot_row = all_matrix.shape[0]
-    train_matrix = all_matrix[0:int(tot_row*0.7)]
-    test_matrix = all_matrix[int(tot_row*0.7):]
-    train_set = dataset(train_matrix)
-    test_set = dataset(test_matrix)
+    print("slicing matrix...")
+    all_data = all_matrix[:,-2:-1]
+    all_target = all_matrix[:,-1]
+    print(np.mean(all_data, axis = 0))
+
+    all_data = scale(all_data, axis = 0)
+
+
+    train_set = dataset(all_data[0:int(tot_row*0.7)], all_target[0:int(tot_row*0.7)])
+    test_set = dataset(all_data[int(tot_row*0.7):], all_target[int(tot_row*0.7):])
+
     return train_set, test_set
 
 model = Sequential()
@@ -63,7 +66,9 @@ model.add(Dense(32, input_dim = input_size, activation = 'relu'))
 model.add(Dense(32, activation = 'relu'))
 model.add(Dense(32, activation = 'relu'))
 model.add(Dense(1, activation='sigmoid'))
-model.compile(optimizer='rmsprop',
+adam = Adam(lr = 0.001)
+
+model.compile(optimizer=adam,
               loss='binary_crossentropy',
               metrics=['accuracy'])
 train_set, test_set = load_dataset()
