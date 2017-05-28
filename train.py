@@ -11,9 +11,9 @@ import tensorflow as tf
 from keras.models import Sequential
 from keras.layers import Dense, Activation, LSTM, Masking
 from keras.models import model_from_json
-from sklearn.preprocessing import scale
+from sklearn.preprocessing import scale, MinMaxScaler
 from keras.optimizers import Adam
-
+from keras.callbacks import ModelCheckpoint
 #model = Sequential()
 #model.add(Dense(32, input_dim=784))
 #model.add(Activation('relu'))
@@ -25,7 +25,7 @@ from keras.optimizers import Adam
 path = "./data/m0000"
 save_path = "./models/"
 input_size = 8
-time_step = 40
+time_step = 5
 
 
 class dataset():
@@ -88,6 +88,8 @@ def prepare_data_for_generator(files):
 	all_matrix = np.concatenate(all_list, axis=0)
 	print("slicing matrix...")
 	all_data = scale(all_matrix, axis = 0)
+	#min_max_scaler = MinMaxScaler()   
+	#all_data = min_max_scaler.fit_transform(all_data_scaled)
 	index = 0
 	for i in range(len(files)):
 		feature_list.append(all_data[index:index+len_list[i],:])
@@ -139,22 +141,28 @@ for file_name in os.listdir(path):
     if file_name.endswith(".out"):
         data_files.append(os.path.join(path, file_name))
 data_files.sort()
+train_len = int(len(data_files)*0.7)
+train_files = data_files[:train_len]
 
 model = Sequential()
 model.add(Masking(mask_value= 0,	input_shape=(time_step, input_size)))
 model.add(LSTM(16, input_shape = (time_step,input_size), activation = 'relu',return_sequences=True))
 model.add(LSTM(32, activation = 'relu',return_sequences=True))
-model.add(LSTM(16, activation = 'relu',return_sequences=False))
+model.add(LSTM(64, activation = 'relu',return_sequences=True))
+model.add(LSTM(32, activation = 'relu',return_sequences=False))
 model.add(Dense(1, activation='sigmoid'))
 adam = Adam(lr = 0.001)
 model.compile(optimizer=adam,
               loss='binary_crossentropy',
               metrics=['accuracy'])
+
+checkpoint = ModelCheckpoint('./model/weights.{epoch:02d}-{val_loss:.2f}.hdf5', monitor='val_loss', verbose=0, save_best_only=False, save_weights_only=False, mode='auto', period=1)
+
 #train_set, test_set = load_dataset()
 #model.fit(train_set.data, train_set.target , epochs=2, batch_size=128, shuffle = False)
 
-index_list, feature_list, label_list = prepare_data_for_generator(data_files)
-model.fit_generator(data_generator(index_list, feature_list, label_list,128),epochs=20, steps_per_epoch=16368)
+index_list, feature_list, label_list = prepare_data_for_generator(train_files)
+model.fit_generator(data_generator(index_list, feature_list, label_list,512),epochs=20, steps_per_epoch=16368, callbacks=[checkpoint])
 #score = model.evaluate(test_set.data, test_set.target, batch_size=128)
 #print(score)
 
