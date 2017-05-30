@@ -170,7 +170,7 @@ model.fit_generator(data_generator(index_list, feature_list, label_list,512),epo
 
 index_list, feature_list, label_list = prepare_data_for_generator(train_files)
 epochstep = int(len(index_list)/10)
-score = evaluate_generator(data_generator(index_list, feature_list, label_list,512,shuffle=False), epochstep)
+score = model.evaluate_generator(data_generator(index_list, feature_list, label_list,512,shuffle=False), epochstep)
 print(score)
 
 save_file = os.path.join(save_path, 'model.json')
