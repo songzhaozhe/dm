@@ -100,9 +100,10 @@ def prepare_data_for_generator(files):
 
 	return index_list, feature_list, label_list
 
-def data_generator(index_list, feature_list, label_list, batch_size = 128):
+def data_generator(index_list, feature_list, label_list, batch_size = 128, shuffle = True):
 
-    random.shuffle(index_list)
+    if shuffle:
+    	random.shuffle(index_list)
     maxlen = len(index_list)
     current = 0
     batch_features = np.zeros([batch_size,time_step,input_size])
@@ -124,7 +125,8 @@ def data_generator(index_list, feature_list, label_list, batch_size = 128):
     			ri = index_list[i].row_index
     			batch_features[i%batch_size] = feature_list[fi][ri:ri+time_step,:]
     			batch_label[i%batch_size] = label_list[fi][ri+time_step-1]
-    		random.shuffle(index_list)
+    		if shuffle:
+    			random.shuffle(index_list)
     		current = 0
     		for i in range(current, nextbatch):
     			fi = index_list[i].file_index
@@ -143,7 +145,7 @@ for file_name in os.listdir(path):
 data_files.sort()
 train_len = int(len(data_files)*0.7)
 train_files = data_files[:train_len]
-
+test_files = data_files[train_len:]
 model = Sequential()
 model.add(Masking(mask_value= 0,	input_shape=(time_step, input_size)))
 model.add(LSTM(16, input_shape = (time_step,input_size), activation = 'relu',return_sequences=True))
@@ -157,14 +159,19 @@ model.compile(optimizer=adam,
               metrics=['accuracy'])
 
 checkpoint = ModelCheckpoint(os.path.join(path,'weights.{epoch:02d}.h5'), monitor='val_acc', verbose=0, save_best_only=False, save_weights_only=False, mode='auto', period=1)
-
 #train_set, test_set = load_dataset()
 #model.fit(train_set.data, train_set.target , epochs=2, batch_size=128, shuffle = False)
 
 index_list, feature_list, label_list = prepare_data_for_generator(train_files)
-model.fit_generator(data_generator(index_list, feature_list, label_list,512),epochs=20, steps_per_epoch=16368, callbacks=[checkpoint])
+epochstep = int(len(index_list)/10)
+model.fit_generator(data_generator(index_list, feature_list, label_list,512),epochs=20, steps_per_epoch=epochstep, callbacks=[checkpoint])
 #score = model.evaluate(test_set.data, test_set.target, batch_size=128)
 #print(score)
+
+index_list, feature_list, label_list = prepare_data_for_generator(train_files)
+epochstep = int(len(index_list)/10)
+score = evaluate_generator(data_generator(index_list, feature_list, label_list,512,shuffle=False), epochstep)
+print(score)
 
 save_file = os.path.join(path, 'model.json')
 save_weights_file = os.path.join(path, 'model.h5')
