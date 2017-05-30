@@ -20,14 +20,14 @@ from keras.callbacks import ModelCheckpoint, History, TensorBoard, CSVLogger
 #model.add(Activation('relu'))
 
 os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"
-os.environ["CUDA_VISIBLE_DEVICES"] = "0"
+os.environ["CUDA_VISIBLE_DEVICES"] = "4"
 # Data sets
 
 path = "./data/m0000"
 save_path = "./models/"
 input_size = 8
 time_step = 5
-epoch_num = 200
+epoch_num = 2000
 batch_size = 512
 
 
@@ -89,7 +89,7 @@ def prepare_data_for_generator(files):
 		all_list.append(tmp[:,:-1])
 		label_list.append(tmp[:,-1])
 	all_matrix = np.concatenate(all_list, axis=0)
-	print("slicing matrix...")
+	#print("slicing matrix...")
 	all_data = scale(all_matrix, axis = 0)
 	#min_max_scaler = MinMaxScaler()   
 	#all_data = min_max_scaler.fit_transform(all_data_scaled)
@@ -137,7 +137,7 @@ def data_generator(index_list, feature_list, label_list, batch_size = 128, shuff
     			batch_features[batch_size - nextbatch + i%batch_size] = feature_list[fi][ri:ri+time_step,:]
     			batch_label[batch_size - nextbatch + i%batch_size] = label_list[fi][ri+time_step-1]
     		current = nextbatch
-    	print(batch_features[0,0])
+    	#print(batch_features[0,0])
     	yield batch_features, batch_label
 
 
