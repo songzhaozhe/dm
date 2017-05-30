@@ -18,8 +18,8 @@ from keras.callbacks import ModelCheckpoint
 #model.add(Dense(32, input_dim=784))
 #model.add(Activation('relu'))
 
-#os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"
-#os.environ["CUDA_VISIBLE_DEVICES"] = "7"
+os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"
+os.environ["CUDA_VISIBLE_DEVICES"] = "4"
 # Data sets
 
 path = "./data/m0000"
@@ -156,7 +156,7 @@ model.compile(optimizer=adam,
               loss='binary_crossentropy',
               metrics=['accuracy'])
 
-checkpoint = ModelCheckpoint('./model/weights.{epoch:02d}-{val_loss:.2f}.hdf5', monitor='val_loss', verbose=0, save_best_only=False, save_weights_only=False, mode='auto', period=1)
+checkpoint = ModelCheckpoint(os.path.join(path,'weights.{epoch:02d}.h5'), monitor='val_acc', verbose=0, save_best_only=False, save_weights_only=False, mode='auto', period=1)
 
 #train_set, test_set = load_dataset()
 #model.fit(train_set.data, train_set.target , epochs=2, batch_size=128, shuffle = False)
