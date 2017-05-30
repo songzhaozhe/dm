@@ -20,7 +20,7 @@ from keras.callbacks import ModelCheckpoint, History, TensorBoard, CSVLogger
 #model.add(Activation('relu'))
 
 os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"
-os.environ["CUDA_VISIBLE_DEVICES"] = "0"
+os.environ["CUDA_VISIBLE_DEVICES"] = "4"
 # Data sets
 
 path = "./data/m0000"
@@ -168,14 +168,14 @@ checkpoint = ModelCheckpoint(os.path.join(save_path,'weights.{epoch:02d}-{acc:.4
 #model.fit(train_set.data, train_set.target , epochs=2, batch_size=128, shuffle = False)
 
 index_list, feature_list, label_list = prepare_data_for_generator(train_files)
-epochstep = int(len(index_list)/10)
-model.fit_generator(data_generator(index_list, feature_list, label_list,512),epochs=20, steps_per_epoch=100, callbacks=[history, tensorboard, csv_logger, checkpoint])
+epochstep = int(len(index_list)/100)
+model.fit_generator(data_generator(index_list, feature_list, label_list,512),epochs=200, steps_per_epoch=epochstep, callbacks=[history, tensorboard, csv_logger, checkpoint])
 #score = model.evaluate(test_set.data, test_set.target, batch_size=128)
 #print(score)
 
 index_list, feature_list, label_list = prepare_data_for_generator(train_files)
-epochstep = int(len(index_list)/10)
-score = evaluate_generator(data_generator(index_list, feature_list, label_list,512,shuffle=False), 100)
+epochstep = len(index_list)
+score = model.evaluate_generator(data_generator(index_list, feature_list, label_list,512,shuffle=False), epochstep)
 print(score)
 
 save_file = os.path.join(save_path, 'model.json')
