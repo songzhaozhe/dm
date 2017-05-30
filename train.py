@@ -11,15 +11,16 @@ import tensorflow as tf
 from keras.models import Sequential
 from keras.layers import Dense, Activation, LSTM, Masking
 from keras.models import model_from_json
-from sklearn.preprocessing import scale, MinMaxScaler
+from sklearn.preprocessing import scale
 from keras.optimizers import Adam
-from keras.callbacks import ModelCheckpoint
+from keras.callbacks import ModelCheckpoint, History, TensorBoard, CSVLogger
+#from visual_callbacks import AccLossPlotter
 #model = Sequential()
 #model.add(Dense(32, input_dim=784))
 #model.add(Activation('relu'))
 
 os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"
-os.environ["CUDA_VISIBLE_DEVICES"] = "4"
+os.environ["CUDA_VISIBLE_DEVICES"] = "0"
 # Data sets
 
 path = "./data/m0000"
@@ -158,19 +159,23 @@ model.compile(optimizer=adam,
               loss='binary_crossentropy',
               metrics=['accuracy'])
 
+history = History()
+tensorboard = TensorBoard()
+csv_logger = CSVLogger('./trainlog.csv')
+#plotter = AccLossPlotter(graphs=['acc', 'loss'], save_graph=True)
 checkpoint = ModelCheckpoint(os.path.join(save_path,'weights.{epoch:02d}-{acc:.4f}.h5'), monitor='val_acc', verbose=0, save_best_only=False, save_weights_only=False, mode='auto', period=1)
 #train_set, test_set = load_dataset()
 #model.fit(train_set.data, train_set.target , epochs=2, batch_size=128, shuffle = False)
 
 index_list, feature_list, label_list = prepare_data_for_generator(train_files)
 epochstep = int(len(index_list)/10)
-model.fit_generator(data_generator(index_list, feature_list, label_list,512),epochs=20, steps_per_epoch=epochstep, callbacks=[checkpoint])
+model.fit_generator(data_generator(index_list, feature_list, label_list,512),epochs=20, steps_per_epoch=100, callbacks=[history, tensorboard, csv_logger, checkpoint])
 #score = model.evaluate(test_set.data, test_set.target, batch_size=128)
 #print(score)
 
 index_list, feature_list, label_list = prepare_data_for_generator(train_files)
 epochstep = int(len(index_list)/10)
-score = evaluate_generator(data_generator(index_list, feature_list, label_list,512,shuffle=False), epochstep)
+score = evaluate_generator(data_generator(index_list, feature_list, label_list,512,shuffle=False), 100)
 print(score)
 
 save_file = os.path.join(save_path, 'model.json')
