@@ -158,7 +158,7 @@ model.compile(optimizer=adam,
               loss='binary_crossentropy',
               metrics=['accuracy'])
 
-checkpoint = ModelCheckpoint(os.path.join(path,'weights.{epoch:02d}.h5'), monitor='val_acc', verbose=0, save_best_only=False, save_weights_only=False, mode='auto', period=1)
+checkpoint = ModelCheckpoint(os.path.join(save_path,'weights.{epoch:02d}-{acc:.4f}.h5'), monitor='val_acc', verbose=0, save_best_only=False, save_weights_only=False, mode='auto', period=1)
 #train_set, test_set = load_dataset()
 #model.fit(train_set.data, train_set.target , epochs=2, batch_size=128, shuffle = False)
 
@@ -173,8 +173,8 @@ epochstep = int(len(index_list)/10)
 score = evaluate_generator(data_generator(index_list, feature_list, label_list,512,shuffle=False), epochstep)
 print(score)
 
-save_file = os.path.join(path, 'model.json')
-save_weights_file = os.path.join(path, 'model.h5')
+save_file = os.path.join(save_path, 'model.json')
+save_weights_file = os.path.join(save_path, 'model.h5')
 model_json = model.to_json()
 with open(save_file, "w") as json_file:
     json_file.write(model_json)
