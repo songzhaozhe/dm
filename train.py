@@ -25,7 +25,7 @@ os.environ["CUDA_VISIBLE_DEVICES"] = "5"
 
 path = "./data/m0000"
 save_path = "./models_20_2/"
-input_size = 8
+input_size = 7
 time_step = 20
 epoch_num = 500
 batch_size = 512
@@ -95,7 +95,7 @@ def prepare_data_for_generator(files):
 	#all_data = min_max_scaler.fit_transform(all_data_scaled)
 	index = 0
 	for i in range(len(files)):
-		feature_list.append(all_data[index:index+len_list[i],:])
+		feature_list.append(all_data[index:index+len_list[i],:input_size])
 		index = index + len_list[i]
 
 	feature_list = np.array(feature_list)
@@ -150,12 +150,12 @@ data_files.sort()
 train_len = int(len(data_files)*0.7)
 train_files = data_files[:train_len]
 test_files = data_files[train_len:]
+lstm_size = 64
 model = Sequential()
-model.add(Masking(mask_value= 0,	input_shape=(time_step, input_size)))
-model.add(LSTM(16, input_shape = (time_step,input_size), activation = 'relu',return_sequences=True))
-model.add(LSTM(32, activation = 'relu',return_sequences=True))
-model.add(LSTM(64, activation = 'relu',return_sequences=True))
-model.add(LSTM(32, activation = 'relu',return_sequences=False))
+model.add(LSTM(lstm_size, input_shape = (time_step,input_size), activation = 'relu',return_sequences=True))
+model.add(LSTM(lstm_size, activation = 'relu',return_sequences=True))
+model.add(LSTM(lstm_size, activation = 'relu',return_sequences=True))
+model.add(LSTM(lstm_size, activation = 'relu',return_sequences=False))
 model.add(Dropout(0.25))
 model.add(Dense(1, activation='sigmoid'))
 adam = Adam(lr = 0.001)
