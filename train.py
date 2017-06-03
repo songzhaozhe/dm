@@ -9,7 +9,7 @@ import random
 import numpy as np
 import tensorflow as tf
 from keras.models import Sequential
-from keras.layers import Dense, Activation, LSTM, Masking
+from keras.layers import Dense, Activation, LSTM, Masking, Dropout
 from keras.models import model_from_json
 from sklearn.preprocessing import scale
 from keras.optimizers import Adam
@@ -20,14 +20,14 @@ from keras.callbacks import ModelCheckpoint, History, TensorBoard, CSVLogger
 #model.add(Activation('relu'))
 
 os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"
-os.environ["CUDA_VISIBLE_DEVICES"] = "4"
+os.environ["CUDA_VISIBLE_DEVICES"] = "5"
 # Data sets
 
 path = "./data/m0000"
-save_path = "./models/"
+save_path = "./models_20_2/"
 input_size = 8
-time_step = 5
-epoch_num = 2000
+time_step = 20
+epoch_num = 500
 batch_size = 512
 
 
@@ -156,6 +156,7 @@ model.add(LSTM(16, input_shape = (time_step,input_size), activation = 'relu',ret
 model.add(LSTM(32, activation = 'relu',return_sequences=True))
 model.add(LSTM(64, activation = 'relu',return_sequences=True))
 model.add(LSTM(32, activation = 'relu',return_sequences=False))
+model.add(Dropout(0.25))
 model.add(Dense(1, activation='sigmoid'))
 adam = Adam(lr = 0.001)
 model.compile(optimizer=adam,
@@ -166,12 +167,12 @@ history = History()
 tensorboard = TensorBoard()
 csv_logger = CSVLogger('./trainlog.csv')
 #plotter = AccLossPlotter(graphs=['acc', 'loss'], save_graph=True)
-checkpoint = ModelCheckpoint(os.path.join(save_path,'weights.{epoch:02d}-{acc:.4f}.h5'), monitor='val_acc', verbose=0, save_best_only=False, save_weights_only=False, mode='auto', period=1)
+checkpoint = ModelCheckpoint(os.path.join(save_path,'weights.{epoch:02d}-{acc:.4f}.h5'), monitor='val_acc', verbose=0, save_best_only=False, save_weights_only=True, mode='auto', period=1)
 #train_set, test_set = load_dataset()
 #model.fit(train_set.data, train_set.target , epochs=2, batch_size=128, shuffle = False)
 
 index_list, feature_list, label_list = prepare_data_for_generator(train_files)
-epochstep = int(2*len(index_list)/epoch_num/batch_size)
+epochstep = int(3*len(index_list)/epoch_num/batch_size)
 model.fit_generator(data_generator(index_list, feature_list, label_list,batch_size),epochs=epoch_num, steps_per_epoch=epochstep, callbacks=[history, tensorboard, csv_logger, checkpoint])
 #score = model.evaluate(test_set.data, test_set.target, batch_size=128)
 #print(score)
