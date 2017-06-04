@@ -24,11 +24,12 @@ os.environ["CUDA_VISIBLE_DEVICES"] = "5"
 # Data sets
 
 path = "./data/m0000"
-save_path = "./models_20_2/"
-input_size = 7
-time_step = 20
+save_path = "./models_40/"
+input_size = 8
+time_step = 40
 epoch_num = 500
 batch_size = 512
+train_times = 2
 
 
 class dataset():
@@ -103,7 +104,44 @@ def prepare_data_for_generator(files):
 
 	return index_list, feature_list, label_list
 
-def data_generator(index_list, feature_list, label_list, batch_size = 128, shuffle = True):
+def train_data_generator(index_list, feature_list, label_list, batch_size = 128, shuffle = True):
+
+    if shuffle:
+    	random.shuffle(index_list)
+    maxlen = len(index_list)
+    current = 0
+    batch_features = np.zeros([batch_size,time_step,input_size])
+    batch_label = np.zeros([batch_size,1])
+    while True:
+    	#batch_features = []
+    	#batch_label = []
+    	if current + batch_size <= maxlen:
+    		for i in range(current,current+batch_size):
+    			fi = index_list[i].file_index
+    			ri = index_list[i].row_index
+    			batch_features[i%batch_size] = feature_list[fi][ri:ri+time_step,:]
+    			batch_label[i%batch_size] = label_list[fi][ri+time_step-1]
+    		current = current + batch_size
+    	else:
+    		nextbatch = current + batch_size - maxlen;
+    		for i in range(current,maxlen):
+    			fi = index_list[i].file_index
+    			ri = index_list[i].row_index
+    			batch_features[i%batch_size] = feature_list[fi][ri:ri+time_step,:]
+    			batch_label[i%batch_size] = label_list[fi][ri+time_step-1]
+    		if shuffle:
+    			random.shuffle(index_list)
+    		current = 0
+    		for i in range(current, nextbatch):
+    			fi = index_list[i].file_index
+    			ri = index_list[i].row_index
+    			batch_features[batch_size - nextbatch + i%batch_size] = feature_list[fi][ri:ri+time_step,:]
+    			batch_label[batch_size - nextbatch + i%batch_size] = label_list[fi][ri+time_step-1]
+    		current = nextbatch
+    	#print(batch_features[0,0])
+    	yield batch_features, batch_label
+
+def test_data_generator(index_list, feature_list, label_list, batch_size = 128, shuffle = True):
 
     if shuffle:
     	random.shuffle(index_list)
@@ -141,21 +179,18 @@ def data_generator(index_list, feature_list, label_list, batch_size = 128, shuff
     	yield batch_features, batch_label
 
 
-
 data_files = []
 for file_name in os.listdir(path):
     if file_name.endswith(".out"):
         data_files.append(os.path.join(path, file_name))
 data_files.sort()
-train_len = int(len(data_files)*0.7)
-train_files = data_files[:train_len]
-test_files = data_files[train_len:]
+
 lstm_size = 64
 model = Sequential()
-model.add(LSTM(lstm_size, input_shape = (time_step,input_size), activation = 'relu',return_sequences=True))
-model.add(LSTM(lstm_size, activation = 'relu',return_sequences=True))
-model.add(LSTM(lstm_size, activation = 'relu',return_sequences=True))
-model.add(LSTM(lstm_size, activation = 'relu',return_sequences=False))
+model.add(LSTM(16, input_shape = (time_step,input_size), activation = 'relu',return_sequences=True))
+model.add(LSTM(32, activation = 'relu',return_sequences=True))
+model.add(LSTM(64, activation = 'relu',return_sequences=True))
+model.add(LSTM(32, activation = 'relu',return_sequences=False))
 model.add(Dropout(0.25))
 model.add(Dense(1, activation='sigmoid'))
 adam = Adam(lr = 0.001)
@@ -167,27 +202,30 @@ history = History()
 tensorboard = TensorBoard()
 csv_logger = CSVLogger('./trainlog.csv')
 #plotter = AccLossPlotter(graphs=['acc', 'loss'], save_graph=True)
-checkpoint = ModelCheckpoint(os.path.join(save_path,'weights.{epoch:02d}-{acc:.4f}.h5'), monitor='val_acc', verbose=0, save_best_only=False, save_weights_only=True, mode='auto', period=1)
+checkpoint = ModelCheckpoint(os.path.join(save_path,'weights.{epoch:02d}-{acc:.4f}.h5'), monitor='val_acc', verbose=0, save_best_only=False, save_weights_only=False, mode='auto', period=1)
 #train_set, test_set = load_dataset()
 #model.fit(train_set.data, train_set.target , epochs=2, batch_size=128, shuffle = False)
 
-index_list, feature_list, label_list = prepare_data_for_generator(train_files)
-epochstep = int(3*len(index_list)/epoch_num/batch_size)
-model.fit_generator(data_generator(index_list, feature_list, label_list,batch_size),epochs=epoch_num, steps_per_epoch=epochstep, callbacks=[history, tensorboard, csv_logger, checkpoint])
+index_list, feature_list, label_list = prepare_data_for_generator(data_files)
+train_len = int(len(index_list)*0.7)
+train_index_list = index_list[:train_len]
+test_index_list = index_list[train_len:]
+
+epochstep = int(train_times*len(train_index_list)/epoch_num/batch_size)
+model.fit_generator(train_data_generator(train_index_list, feature_list, label_list,batch_size),epochs=epoch_num, steps_per_epoch=epochstep, callbacks=[history, tensorboard, csv_logger, checkpoint])
 #score = model.evaluate(test_set.data, test_set.target, batch_size=128)
 #print(score)
 
-index_list, feature_list, label_list = prepare_data_for_generator(train_files)
-epochstep = int(len(index_list)/batch_size)
-score = model.evaluate_generator(data_generator(index_list, feature_list, label_list,batch_size,shuffle=False), epochstep)
+epochstep = int(len(test_index_list)/batch_size)
+score = model.evaluate_generator(test_data_generator(test_index_list, feature_list, label_list,batch_size,shuffle=False), epochstep)
 print(score)
 
-save_file = os.path.join(save_path, 'model.json')
-save_weights_file = os.path.join(save_path, 'model.h5')
-model_json = model.to_json()
-with open(save_file, "w") as json_file:
-    json_file.write(model_json)
+#save_file = os.path.join(save_path, 'model.json')
+save_file = os.path.join(save_path, 'model.h5')
+#model_json = model.to_json()
+#with open(save_file, "w") as json_file:
+#    json_file.write(model_json)
 # serialize weights to HDF5
-model.save_weights(save_weights_file)
+model.save(save_file)
 print("Saved model to disk")
 # print('accuracy on test set: %.2f%%' % )
