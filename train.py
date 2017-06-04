@@ -27,9 +27,9 @@ os.environ["CUDA_VISIBLE_DEVICES"] = "5"
 # Data sets
 
 path = "./data/m0000"
-save_path = "./model/LSTM_100/"
+save_path = "./model/LSTM_10/"
 input_size = 7
-time_step = 20
+time_step = 40
 epoch_num = 5
 batch_size = 512
 model_name = 'LSTMModel'
@@ -101,7 +101,8 @@ def prepare_data_for_generator(files):
         label_list.append(tmp[:, -1])
     all_matrix = np.concatenate(all_list, axis=0)
     # print("slicing matrix...")
-    all_data = scale(all_matrix, axis=0)
+    all_data = all_matrix
+    #all_data = scale(all_matrix, axis=0)
     # min_max_scaler = MinMaxScaler()
     # all_data = min_max_scaler.fit_transform(all_data_scaled)
     index = 0
@@ -148,7 +149,6 @@ def data_generator(index_list, feature_list, label_list, batch_size=128, shuffle
                 batch_features[batch_size - nextbatch + i % batch_size] = feature_list[fi][ri:ri + time_step, :]
                 batch_label[batch_size - nextbatch + i % batch_size] = label_list[fi][ri + time_step - 1]
             current = nextbatch
-        # print(batch_features[0,0])
         yield batch_features, batch_label
 
 

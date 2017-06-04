@@ -16,9 +16,9 @@ class LSTMModel(BaseModel):
         lstm_size = 64
         model = Sequential()
         model.add(LSTM(lstm_size, input_shape = input, activation='relu', return_sequences=True))
-        model.add(LSTM(lstm_size, activation='relu', return_sequences=True))
         #model.add(LSTM(lstm_size, activation='relu', return_sequences=True))
-        #model.add(LSTM(lstm_size, activation='relu', return_sequences=False))
+        #model.add(LSTM(lstm_size, activation='relu', return_sequences=True))
+        model.add(LSTM(lstm_size, activation='relu', return_sequences=False))
         #model.add(Dropout(0.25))
         model.add(Dense(1, activation='sigmoid'))
         adam = Adam(lr=0.001)
