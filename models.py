@@ -15,11 +15,11 @@ class LSTMModel(BaseModel):
     def create_model(self, input):
         lstm_size = 64
         model = Sequential()
-        model.add(LSTM(lstm_size, input_shape = input, activation='relu', return_sequences=True))
-        #model.add(LSTM(lstm_size, activation='relu', return_sequences=True))
-        #model.add(LSTM(lstm_size, activation='relu', return_sequences=True))
-        model.add(LSTM(lstm_size, activation='relu', return_sequences=False))
-        #model.add(Dropout(0.25))
+        model.add(LSTM(16, input_shape=(time_step, input_size), activation='relu', return_sequences=True))
+        model.add(LSTM(32, activation='relu', return_sequences=True))
+        model.add(LSTM(64, activation='relu', return_sequences=True))
+        model.add(LSTM(32, activation='relu', return_sequences=False))
+        model.add(Dropout(0.25))
         model.add(Dense(1, activation='sigmoid'))
         adam = Adam(lr=0.001)
         model.compile(optimizer=adam,
