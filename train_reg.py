@@ -15,7 +15,7 @@ from keras.models import model_from_json
 from sklearn.preprocessing import scale
 from keras.optimizers import Adam
 from keras.callbacks import ModelCheckpoint, History, TensorBoard, CSVLogger
-import models
+import reg_models
 
 # from visual_callbacks import AccLossPlotter
 # model = Sequential()
@@ -198,11 +198,11 @@ def test_data_generator(index_list, feature_list, label_list, batch_size=128, sh
 
 data_files = []
 for file_name in os.listdir(path):
-    if file_name.endswith(".out"):
+    if file_name.endswith(".reg_out"):
         data_files.append(os.path.join(path, file_name))
 data_files.sort()
 
-model_instance = find_class_by_name(model_name, [models])()
+model_instance = find_class_by_name(model_name, [reg_models])()
 model = model_instance.create_model((time_step, input_size))
 
 history = History()
