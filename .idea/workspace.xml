@@ -1,29 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="e8fd1217-4e1c-4e1c-8533-6641a8c9b778" name="Default" comment="">
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/logs/events.out.tfevents.1496210272.gpu02" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/logs/events.out.tfevents.1496286345.gpu02" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/logs/events.out.tfevents.1496318501.gpu02" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/logs/events.out.tfevents.1496320991.gpu02" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/models.py" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/process_data_reg.py" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/reg_models.py" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/test.py" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/train_reg.py" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/xgboost_random_test.py" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/xgboost_train.py" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/.idea/deployment.xml" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/.idea/inspectionProfiles/profiles_settings.xml" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/.idea/misc.xml" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/.idea/modules.xml" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/.idea/project.iml" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/.idea/vcs.xml" afterPath="" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.gitignore" afterPath="$PROJECT_DIR$/.gitignore" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/process_data.py" afterPath="$PROJECT_DIR$/process_data.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/train.py" afterPath="$PROJECT_DIR$/train.py" />
-    </list>
+    <list default="true" id="e8fd1217-4e1c-4e1c-8533-6641a8c9b778" name="Default" comment="" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
