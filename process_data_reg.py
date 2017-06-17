@@ -32,30 +32,30 @@ def process_label(file_name, id):
                     day_matrix[j,i] = day_matrix[j-1,i]
         day_matrix[j,7] = day_matrix[j,6] - day_matrix[j,5]
         avg_price_cur = (day_matrix[j, 3] + day_matrix[j, 4]) / 2
-        avg_price_next = (day_matrix[j+1, 3] + day_matrix[j+1, 4]) / 2
-        if avg_price_cur < avg_price_next:
-            dp[j] = 1
-        elif avg_price_cur > avg_price_next:
-            dp[j] = 0
-        else:
-            dp[j] = dp[j + 1]
 
         i = j - STEP
         if i < 0:
             continue
         avg_price_i = (day_matrix[i, 3] + day_matrix[i, 4]) / 2
-        if avg_price_i < avg_price_cur:
-            day_matrix[i, -1] = 1  # 1表示升了
-        elif avg_price_i > avg_price_cur:
-            day_matrix[i, -1] = 0
+
+        if avg_price_i != avg_price_cur:
+            day_matrix[i,-1] = avg_price_cur - avg_price_i
         else:
-            if dp[j] == -1:
+            tmp = j+1
+            while (tmp < day_matrix.shape[0] and (day_matrix[tmp, 3] + day_matrix[tmp, 4]) / 2 == avg_price_i):
+                tmp = tmp + 1
+            if tmp == day_matrix.shape[0]:
                 last_row_num = i
             else:
-                day_matrix[i, -1] = dp[j]
+                avg_price_cur = (day_matrix[tmp, 3] + day_matrix[tmp, 4]) / 2
+                day_matrix[i, -1] = (avg_price_cur - avg_price_i)*1.0/(tmp-j+1)
+        if day_matrix[i,-1] == 0 and i < last_row_num:
+            print("WARNING!! 0 appeared on line %d"%i)
+
+
     day_matrix = day_matrix[0:last_row_num]
     path = get_path()
-    file = open(os.path.join(path, '%d.out' %id), 'w')
+    file = open(os.path.join(path, '%d.reg_out' %id), 'w')
     np.save(file,day_matrix)
     file.close()
 
