@@ -32,7 +32,7 @@ class LSTMModel(BaseModel):
         adam = Adam(lr=0.001)
         model.compile(optimizer=adam,
                       loss='mean_squared_error',
-                      metrics=[custom_acc])
+                      metrics=['acc', custom_acc])
         return model
 
 class LogisticModel(BaseModel):
@@ -45,5 +45,5 @@ class LogisticModel(BaseModel):
         adam = Adam(lr=0.001)
         model.compile(optimizer=adam,
                       loss='mean_squared_error',
-                      metrics=[custom_acc])
+                      metrics=['acc', custom_acc])
         return model

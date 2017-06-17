@@ -7,7 +7,7 @@ import xgboost as xgb
 from sklearn.preprocessing import scale
 from sklearn.cross_validation import train_test_split
 input_size = 8
-input_time = 10
+input_time = 5
 path = "./data/m0000"
 
 class dataset():
@@ -72,26 +72,26 @@ param = {}
 # use softmax multi-class classification
 param['objective'] = 'multi:softmax'
 # scale weight of positive examples
-param['eta'] = 0.05
-param['max_depth'] = 10
+param['eta'] = 0.1
+param['max_depth'] = 12
 param['silent'] = 1
 param['nthread'] = 4
 param['num_class'] = 2
 
 watchlist = [(xg_train, 'train'), (xg_test, 'test')]
-num_round = 5
+num_round = 15
 bst = xgb.train(param, xg_train, num_round, watchlist)
 # get prediction
 pred = bst.predict(xg_test)
 error_rate = np.sum(pred != test_Y) / test_Y.shape[0]
 print('Test error using softmax = {}'.format(error_rate))
 
-# do the same thing again, but output probabilities
-param['objective'] = 'multi:softprob'
-bst = xgb.train(param, xg_train, num_round, watchlist)
-# Note: this convention has been changed since xgboost-unity
-# get prediction, this is in 1D array, need reshape to (ndata, nclass)
-pred_prob = bst.predict(xg_test).reshape(test_Y.shape[0], 2)
-pred_label = np.argmax(pred_prob, axis=1)
-error_rate = np.sum(pred != test_Y) / test_Y.shape[0]
-print('Test error using softprob = {}'.format(error_rate))
+# # do the same thing again, but output probabilities
+# param['objective'] = 'multi:softprob'
+# bst = xgb.train(param, xg_train, num_round, watchlist)
+# # Note: this convention has been changed since xgboost-unity
+# # get prediction, this is in 1D array, need reshape to (ndata, nclass)
+# pred_prob = bst.predict(xg_test).reshape(test_Y.shape[0], 2)
+# pred_label = np.argmax(pred_prob, axis=1)
+# error_rate = np.sum(pred != test_Y) / test_Y.shape[0]
+# print('Test error using softprob = {}'.format(error_rate))

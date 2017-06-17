@@ -64,7 +64,7 @@ param['nthread'] = 4
 param['num_class'] = 2
 
 watchlist = [(xg_train, 'train'), (xg_test, 'test')]
-num_round = 5
+num_round = 20
 bst = xgb.train(param, xg_train, num_round, watchlist)
 # get prediction
 pred = bst.predict(xg_test)
