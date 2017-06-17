@@ -7,7 +7,6 @@ from __future__ import print_function
 import os
 import random
 import numpy as np
-from random import shuffle
 
 import tensorflow as tf
 from keras.models import Sequential
@@ -16,7 +15,7 @@ from keras.models import model_from_json
 from sklearn.preprocessing import scale
 from keras.optimizers import Adam
 from keras.callbacks import ModelCheckpoint, History, TensorBoard, CSVLogger
-import models
+import reg_models
 
 # from visual_callbacks import AccLossPlotter
 # model = Sequential()
@@ -24,17 +23,16 @@ import models
 # model.add(Activation('relu'))
 
 os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"
-os.environ["CUDA_VISIBLE_DEVICES"] = "4"
+os.environ["CUDA_VISIBLE_DEVICES"] = "5"
 # Data sets
-model_name = 'BaselineModel'
+model_name = 'LSTMModel'
 path = "./data/m0000"
 save_path = "./model/"+model_name+"/test/"
 
 input_size = 8
-time_step = 1
-epoch_num = 50
+time_step = 20
+epoch_num = 5
 batch_size = 512
-one_feature = True
 
 train_times = 3
 
@@ -78,7 +76,7 @@ def load_dataset():
     all_matrix = np.concatenate(all_list, axis=0)
     tot_row = all_matrix.shape[0]
     print("slicing matrix...")
-    all_data = all_matrix[:, :input_size]
+    all_data = all_matrix[:, :-1]
     # print ('all_Data',len(all_data[0]))
     all_target = all_matrix[:, -1]
     # print(np.mean(all_data, axis = 0))
@@ -158,10 +156,7 @@ def train_data_generator(index_list, feature_list, label_list, batch_size=128, s
                 batch_label[batch_size - nextbatch + i % batch_size] = label_list[fi][ri + time_step - 1]
             current = nextbatch
         # print(batch_features[0,0])
-        if one_feature == True:
-            yield batch_features[:,0,7], batch_label
-        else:
-            yield batch_features, batch_label
+        yield batch_features, batch_label
 
 
 def test_data_generator(index_list, feature_list, label_list, batch_size=128, shuffle=True):
@@ -198,20 +193,16 @@ def test_data_generator(index_list, feature_list, label_list, batch_size=128, sh
                 batch_label[batch_size - nextbatch + i % batch_size] = label_list[fi][ri + time_step - 1]
             current = nextbatch
         # print(batch_features[0,0])
-        if one_feature == True:
-            yield batch_features[:,0,7], batch_label
-        else:
-            yield batch_features, batch_label
+        yield batch_features, batch_label
 
 
 data_files = []
 for file_name in os.listdir(path):
-    if file_name.endswith(".out"):
+    if file_name.endswith(".reg_out"):
         data_files.append(os.path.join(path, file_name))
 data_files.sort()
-shuffle(data_files)
 
-model_instance = find_class_by_name(model_name, [models])()
+model_instance = find_class_by_name(model_name, [reg_models])()
 model = model_instance.create_model((time_step, input_size))
 
 history = History()
