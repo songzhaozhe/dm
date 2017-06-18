@@ -10,7 +10,7 @@ from sklearn.cross_validation import train_test_split
 parser = argparse.ArgumentParser()
 parser.add_argument('-dir', '--data_dir', type=str, default="./data/m0000",
                             help='path to the dataset')
-parser.add_argument('-ts', '--time_step', type=int, default=5,
+parser.add_argument('-ts', '--time_step', type=int, default=1,
                             help='how many ticks as input')
 parser.add_argument('-eta', '--eta', type=float, default=0.1,
                             help='shrinkage rate, equal to learning rate')
