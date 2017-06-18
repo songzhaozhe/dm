@@ -3,12 +3,29 @@
 from __future__ import division
 import os
 import numpy as np
+import argparse
 import xgboost as xgb
 from sklearn.preprocessing import scale
 from sklearn.cross_validation import train_test_split
+parser = argparse.ArgumentParser()
+parser.add_argument('-dir', '--data_dir', type=str, default="./data/m0000",
+                            help='path to the dataset')
+parser.add_argument('-ts', '--time_step', type=int, default=5,
+                            help='how many ticks as input')
+parser.add_argument('-eta', '--eta', type=float, default=0.1,
+                            help='shrinkage rate, equal to learning rate')
+parser.add_argument('-maxd', '--max_depth', type=int, default=12,
+                            help='the maximun depth for one tree')
+parser.add_argument('-s', '--silent', type=int, default=1, choices=[0,1],
+                            help='whether print the train log')
+parser.add_argument('-nth', '--thread_num', type=int, default=4,
+                            help='thread number used for training')
+parser.add_argument('-round', '--round_num', type=int, default=15,
+                            help='training round')
+args = parser.parse_args()
 input_size = 8
-input_time = 5
-path = "./data/m0000"
+input_time = args.time_step
+path = args.data_dir
 
 class dataset():
     def __init__(self, data, target):
@@ -72,14 +89,14 @@ param = {}
 # use softmax multi-class classification
 param['objective'] = 'multi:softmax'
 # scale weight of positive examples
-param['eta'] = 0.1
-param['max_depth'] = 12
-param['silent'] = 1
-param['nthread'] = 4
+param['eta'] = args.eta
+param['max_depth'] = args.max_depth
+param['silent'] = args.silent
+param['nthread'] = args.thread_num
 param['num_class'] = 2
 
 watchlist = [(xg_train, 'train'), (xg_test, 'test')]
-num_round = 15
+num_round = args.round_num
 bst = xgb.train(param, xg_train, num_round, watchlist)
 # get prediction
 pred = bst.predict(xg_test)
