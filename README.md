@@ -30,7 +30,7 @@ Do the data pre-processing by ruuning:
 ```
 python process_data.py
 ```
-If you have save your data to other directory, running:
+If you have saved your data to other directory, running:
 ```
 python process_data.py -dir yourpath
 ```
@@ -40,7 +40,7 @@ In this task, we tried to convert the labeling question into a regression one an
 ```
 python process_data_reg.py
 ```
-If you have save your data to other directory, running:
+If you haved save your data to other directory, running:
 ```
 python process_data_reg.py -dir yourpath
 ```
@@ -53,14 +53,14 @@ These models can be trained by running `train.py` with diffrent arguments. For e
 python train.py -m LSTMModel
 ```
 You can also select the model and modify the training parameters with command line arguments as follow:
-* -m [BaselineModel|LSTMModel|LogisticModel] - the model you wish to train
-* -dir ... path to the dataset - don't required if you save your data in recommended way
-* -o ... the directory you wish to save the training result. default directory is ./model/model_name/test/
-* -ts 20 ... time step - how many ticks you wish to use to predict the price trend. this parameter is unmeaning for BaselineModel. default is 20
-* -bs 512 ... batch size - larger values usually speed up training however increase the memory usage. default is 512
-* -tt 3 ... traverse time - how many time the train dataset will be traverse. An overfitting problem will happened if it's too big. default is 3
-* -ep 50 ... epoch number - our training use generator to create the data stream for training. larger epoch number will have more outputed training loss and acc information while the sample number in each epoch will be small. default is 50
-* -id 0 ... GPU id - required for computer with multi-GPU to choose which GPU to use. default is 0
+* -m [BaselineModel|LSTMModel|LogisticModel] - the model you wish to train. Default is BaselineModel.
+* -dir ... path to the dataset - unrequired if you save your data in recommended way.
+* -o ... the directory you wish to save the training result. The default directory is ./model/model_name/test/
+* -ts 20 ... time step - how many ticks you wish to use to predict the price trend. This parameter is unmeaning for BaselineModel. Default is 20.
+* -bs 512 ... batch size - larger values usually speed up training however increase the memory usage. Default is 512.
+* -tt 3 ... traverse time - how many time the train dataset will be traverse. An overfitting problem will happened if it's too big. Default is 3.
+* -ep 50 ... epoch number - our training use generator to create the data stream for training. Larger epoch number will have more outputed training loss and acc information while the sample number in each epoch will be small. Default is 50.
+* -id 0 ... GPU id - required for computer with multi-GPU to choose which GPU to use. Default is 0.
 
 ### MSE trick
 If you want to use the MSE trick for training, make sure you have done the pre-processing for it.Then, run `train_reg.py` instead of `train.py`. The command line arguments they used are same.
@@ -71,13 +71,13 @@ XGBoost model can be trained by running:
 python xgboost_train.py
 ```
 You can also modify the parameters of XGBoost with command line arguments as follow:
-* -dir ... path to the dataset - don't required if you save your data in recommended way
-* -ts 5 ... time step - how many ticks you wish to use to predict the price trend. default is 5
-* -eta 0.1 ... the shrinkage rate, which is equal to learning rate in other model. a float number from 0 to 1. default is 0.1
-* -maxd 12 ... max depth for one tree. A large depth may lead to overfitting problem. default is 12
-* -nth 4 ... number of tread used for training. default is 4
-* -round 15 ... number of training round. default is 15
-* -s 1 ... 0 for print the training log and 1 for not. default is 1
+* -dir ... path to the dataset - unrequired if you save your data in recommended way.
+* -ts 5 ... time step - how many ticks you wish to use to predict the price trend. Default is 5.
+* -eta 0.1 ... the shrinkage rate, which is equal to learning rate in other model. A float number from 0 to 1. Default is 0.1.
+* -maxd 12 ... max depth for one tree. A large depth may lead to overfitting problem. Default is 12.
+* -nth 4 ... number of tread used for training. Default is 4.
+* -round 15 ... number of training round. Default is 15.
+* -s 1 ... 0 for print the training log and 1 for not. Default is 1.
 
 # Contributors
 Zhaozhe Song, Wenhao Qu
