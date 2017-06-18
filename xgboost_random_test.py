@@ -2,12 +2,17 @@
 
 from __future__ import division
 import os
+import argparse
 import numpy as np
 import xgboost as xgb
 from sklearn.preprocessing import scale
 from sklearn.cross_validation import train_test_split
+parser = argparse.ArgumentParser()
+parser.add_argument('-dir', '--data_dir', type=str, default="./data/m0000",
+                            help='path to the dataset')
+args = parser.parse_args()
 input_size = 8
-path = "./data/m0000"
+path = args.data_dir
 
 class dataset():
     def __init__(self, data, target):

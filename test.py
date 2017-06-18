@@ -6,6 +6,7 @@ from __future__ import print_function
 
 import os
 import random
+import argparse
 import numpy as np
 import tensorflow as tf
 from keras.models import Sequential
@@ -14,13 +15,34 @@ from keras.models import model_from_json, load_model
 from sklearn.preprocessing import scale
 from keras.optimizers import Adam
 from keras.callbacks import ModelCheckpoint, History, TensorBoard, CSVLogger
+parser = argparse.ArgumentParser()
+parser.add_argument('-dir', '--data_dir', type=str, default="./data/m0000",
+                            help='path to the dataset')
+parser.add_argument('-wdir', '--weight_dir', type=str, default="./models/",
+                            help='path to the weight file')
+parser.add_argument('-w', '--weight_file_name', type=str,
+                            help='weight file name')
+parser.add_argument('-ts', '--time_step', type=int, default=20,
+                            help='how many ticks as input (useless for BaselineModel)')
+parser.add_argument('-bs', '--batch_size', type=int, default=512,
+                            help='batch size')
+parser.add_argument('-ep', '--epoch_num', type=int, default=50,
+                            help='how many epoch')
+parser.add_argument('-id', '--gpu_id', type=int, default=0,
+                            help='how many epoch')
 
-path = "./data/m0000"
-save_path = "./models/"
+args = parser.parse_args()
+
+os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"
+os.environ["CUDA_VISIBLE_DEVICES"] = str(args.gpu_id)
+
+path = args.data_dir
+save_path = args.weight_dir
+weight_file_name = args.weight_file_name
 input_size = 8
-time_step = 20
-epoch_num = 500
-batch_size = 512
+time_step = args.time_step
+epoch_num = args.epoch_num
+batch_size = args.batch_size
 
 class indexset():
 	def __init__(self,file_index, row_index):
@@ -102,7 +124,7 @@ train_len = int(len(data_files)*0.7)
 train_files = data_files[:train_len]
 test_files = data_files[train_len:]
 
-model_path = os.path.join(save_path, "weights.390-0.6015.h5")
+model_path = os.path.join(save_path, weight_file_name)
 model = load_model(model_path)
 
 index_list, feature_list, label_list = prepare_data_for_generator(test_files)

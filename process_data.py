@@ -2,10 +2,17 @@
 import pandas as pd
 import numpy as np
 import os
+import argparse
+
+parser = argparse.ArgumentParser()
+parser.add_argument('-dir', '--data_dir', type=str, default="./data/m0000",
+                            help='path to the dataset')
+args = parser.parse_args()
+
 #['LastPrice'#0, 'LastVolume'#1, 'LastTurnover'#2, 'AskPrice1'#3, 'BidPrice1'#4, 'AskVolume1'#5, 'BidVolume1'#6, #7,#8]
 
 def get_path():
-    return "./data/m0000"
+    return args.data_dir
 def get_STEP():
     return 20
 def get_needed_columns():

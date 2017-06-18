@@ -8,6 +8,7 @@ import os
 import random
 import numpy as np
 from random import shuffle
+import argparse
 
 import tensorflow as tf
 from keras.models import Sequential
@@ -18,25 +19,48 @@ from keras.optimizers import Adam
 from keras.callbacks import ModelCheckpoint, History, TensorBoard, CSVLogger
 import models
 
-# from visual_callbacks import AccLossPlotter
-# model = Sequential()
-# model.add(Dense(32, input_dim=784))
-# model.add(Activation('relu'))
+parser = argparse.ArgumentParser()
+parser.add_argument('-m', '--model_name', type=str, default="BaselineModel", choices=['BaselineModel','LSTMModel', 'LogisticModel'],
+                            help='model for training')
+parser.add_argument('-dir', '--data_dir', type=str, default="./data/m0000",
+                            help='path to the dataset')
+parser.add_argument('-o', '--output_dir', type=str, default=None,
+                            help='path to the output dir')
+parser.add_argument('-ts', '--time_step', type=int, default=20,
+                            help='how many ticks as input (useless for BaselineModel)')
+parser.add_argument('-bs', '--batch_size', type=int, default=512,
+                            help='batch size')
+parser.add_argument('-tt', '--traverse_time', type=int, default=3,
+                            help='how many times to traverse the train dataset')
+parser.add_argument('-ep', '--epoch_num', type=int, default=50,
+                            help='how many epoch')
+parser.add_argument('-id', '--gpu_id', type=int, default=0,
+                            help='how many epoch')
+
+args = parser.parse_args()
 
 os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"
-os.environ["CUDA_VISIBLE_DEVICES"] = "4"
+os.environ["CUDA_VISIBLE_DEVICES"] = str(args.gpu_id)
+
 # Data sets
-model_name = 'BaselineModel'
-path = "./data/m0000"
-save_path = "./model/"+model_name+"/test/"
+model_name = args.model_name
+path = args.data_dir
+if args.output_dir != None:
+    save_path = args.output_dir
+else:
+    save_path = "./model/"+model_name+"/test/"
 
 input_size = 8
-time_step = 1
-epoch_num = 50
-batch_size = 512
-one_feature = True
+epoch_num = args.epoch_num
+batch_size = args.batch_size
+train_times = args.traverse_time
+if model_name == "BaselineModel":
+    one_feature = True
+    time_step = 1
+else:
+    time_step = args.time_step
 
-train_times = 3
+
 
 if not os.path.exists(save_path):
     os.makedirs(save_path)
