@@ -52,7 +52,7 @@ These models can be trained by running `train.py` with diffrent arguments. For e
 ```
 python train.py -m LSTMModel
 ```
-You can also select the model and change the training parameter with command line arguments as follow:
+You can also select the model and modify the training parameters with command line arguments as follow:
 * -m [BaselineModel|LSTMModel|LogisticModel] - the model you wish to train
 * -dir ... path to the dataset - don't required if you save your data in recommended way
 * -o ... the directory you wish to save the training result. default directory is ./model/model_name/test/
@@ -70,7 +70,7 @@ XGBoost model can be trained by running:
 ```
 python xgboost_train.py
 ```
-You can also change the parameter of XGBoost with command line arguments as follow:
+You can also modify the parameters of XGBoost with command line arguments as follow:
 * -dir ... path to the dataset - don't required if you save your data in recommended way
 * -ts 5 ... time step - how many ticks you wish to use to predict the price trend. default is 5
 * -eta 0.1 ... the shrinkage rate, which is equal to learning rate in other model. a float number from 0 to 1. default is 0.1
